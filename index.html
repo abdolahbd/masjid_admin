@@ -354,14 +354,14 @@ label{
                                     <input type="text" class="form-control" id="contact" placeholder="نقطة اتصال">
                                 </div>
                                 <div class="form-group">
-                                    <label  for="type">المحسنين/الأوقاف</label>
+                                    <label  for="type">المسير</label>
                                     <select class="form-control" id="type">
                                         <option value="المحسنين">المحسنين</option>
                                         <option value="الأوقاف">الأوقاف</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label  for="progress">مستوى التقدم</label>
+                                    <label  for="progress">وضعية المسجد</label>
                                     <select class="form-control" id="progress">
                                         <option value="مبرمج">مبرمج</option>
                                         <option value="غير مبرمج">غير مبرمج</option>
@@ -406,39 +406,45 @@ label{
                     <div id="tableDiv" class="mt-5">
                         <h1 id="h1-3">
                             تعديل بيانات مسجد</h1>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>اسم المسجد</th>
-                                    <th>نقطة الاتصال</th>
-                                    <th>المحسنين/الأوقاف</th>
-                                    <th>تاريخ التنظيف</th>
-                                    <th>مستوى التقدم</th>
-                                    <th>مدة التنظيف (بالساعات)</th>
-                                    <th>X احداثيات</th>
-                                    <th>Y احداثيات</th>
-                                    <th>العملية</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                <tr>
-                                    <td class="editable" data-id="${childSnapshot.key}" data-field="name">${data.name}</td>
-                                    <td class="editable" data-id="${childSnapshot.key}" data-field="contact">${data.contact}</td>
-                                    <td class="editable" data-id="${childSnapshot.key}" data-field="type">${data.type}</td>
-                                    <td class="editable" data-id="${childSnapshot.key}" data-field="cleaning_date">${data.cleaning_date}</td>
-                                    <td class="editable" data-id="${childSnapshot.key}" data-field="progress">${data.progress}</td>
-                                    <td class="editable" data-id="${childSnapshot.key}" data-field="cleaning_duration">${data.cleaning_duration}</td>
-                                    <td class="editable" data-id="${childSnapshot.key}" data-field="longitude">${data.longitude}</td>
-                                    <td class="editable" data-id="${childSnapshot.key}" data-field="latitude">${data.latitude}</td>
-                                    <td>
-                                        <button class="btn btn-warning" onclick="changeMarkerColor('${childSnapshot.key}')">المكان</button>
-                                        <button class="btn btn-warning" onclick="gm('${childSnapshot.key}')">Google maps</button>
-                                        <button class="btn btn-danger" onclick="deleteRecord('${childSnapshot.key}')">حذف</button>
-                                    </td>
-                                </tr>
-                            </tbody>
+
+                            <div class="input-group mb-3">
+                                <input id="searchInput" type="text" class="form-control" placeholder="بحث عن المسجد أو الوضعية">
+                            </div>
                             
-                        </table>
+
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>الموقع</th>
+                                        <th>Y احداثيات</th>
+                                        <th>X احداثيات</th>
+                                        <th>مدة التنظيف (بالساعات)</th>
+                                        <th>وضعية المسجد</th>
+                                        <th>تاريخ التنظيف</th>
+                                        <th>المسير</th>
+                                        <th>نقطة الاتصال</th>
+                                        <th>اسم المسجد</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody">
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-warning" onclick="changeMarkerColor('${childSnapshot.key}')">المكان</button>
+                                            <button class="btn btn-warning" onclick="gm('${childSnapshot.key}')">Google maps</button>
+                                            <button class="btn btn-danger" onclick="deleteRecord('${childSnapshot.key}')">حذف</button>
+                                        </td>
+                                        <td class="editable" data-id="${childSnapshot.key}" data-field="latitude">${data.latitude}</td>
+                                        <td class="editable" data-id="${childSnapshot.key}" data-field="longitude">${data.longitude}</td>
+                                        <td class="editable" data-id="${childSnapshot.key}" data-field="cleaning_duration">${data.cleaning_duration}</td>
+                                        <td class="editable" data-id="${childSnapshot.key}" data-field="progress">${data.progress}</td>
+                                        <td class="editable" data-id="${childSnapshot.key}" data-field="cleaning_date">${data.cleaning_date}</td>
+                                        <td class="editable" data-id="${childSnapshot.key}" data-field="type">${data.type}</td>
+                                        <td class="editable" data-id="${childSnapshot.key}" data-field="contact">${data.contact}</td>
+                                        <td class="editable" data-id="${childSnapshot.key}" data-field="name">${data.name}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
                     </div>
                 </div>
             </li>
@@ -472,6 +478,21 @@ label{
 
 
         $(document).ready(function () {
+
+
+
+
+
+
+  // Search bar functionality
+  $("#searchInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#tableBody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+
 
 
             document.getElementById('progress').addEventListener('change', function() {
@@ -599,7 +620,7 @@ label{
     let progress = getInputVal('progress');
     let cleaning_duration = getInputVal('cleaning_duration');
 
-    // إذا كان مستوى التقدم "غير مبرمج"، اجعل تاريخ التنظيف كـ سترينغ فارغ
+    // إذا كان وضعية المسجد "غير مبرمج"، اجعل تاريخ التنظيف كـ سترينغ فارغ
     if (progress === "غير مبرمج") {
         cleaning_date = "لا يوجد";
     }
@@ -633,6 +654,7 @@ label{
             messagesRef.once('value', function (snapshot) {
                 const mosqueCoords = [];
                 snapshot.forEach(function (childSnapshot) {
+                    
                     let data = childSnapshot.val();
                     mosqueCoords.push({
                         id: childSnapshot.key,
@@ -656,6 +678,8 @@ label{
 
 
   function updateMapGraphics(mosqueCoords) {
+    console.log(mosqueCoords);
+    
     require([
         "esri/Map",
         "esri/views/MapView",
@@ -723,6 +747,7 @@ label{
                 longitude: mosque.longitude,
                 latitude: mosque.latitude
             };
+            
             var symbol;
             if (mosque.progress === "مبرمج") {
                 symbol = redMarkerSymbol;
@@ -731,6 +756,7 @@ label{
             } else if (mosque.progress === "منظف") {
                 symbol = blueMarkerSymbol;
             }
+            console.log(point,symbol);
 
 
 
@@ -740,9 +766,9 @@ label{
                 `<div id="popup">
                     <b>اسم المسجد :</b> ${mosque.name}<br>
                     <b>نقطة اتصال :</b> ${mosque.contact}<br>
-                    <b>المحسنين/الأوقاف :</b> ${mosque.type}<br>
+                    <b>المسير :</b> ${mosque.type}<br>
                     <b>تاريخ التنظيف :</b> ${mosque.cleaning_date}<br>
-                    <b>مستوى التقدم :</b> ${mosque.progress}<br>
+                    <b>وضعية المسجد :</b> ${mosque.progress}<br>
                     <b>مدة التنظيف (بالساعات) :</b> ${mosque.cleaning_duration}<br>
                 </div>`
             };
@@ -754,7 +780,14 @@ label{
                 popupTemplate: popupTemplate
             });
             graphicsLayer.add(graphic);
+
+
+                    console.log(graphic);
+
         });
+
+
+
 
         view.popup.defaultPopupTemplateEnabled = true;
         view.on("click", function (event) {
@@ -808,34 +841,34 @@ label{
         
 
 
-        function loadTableData() {
-            messagesRef.once('value', function (snapshot) {
-                const tableBody = document.getElementById('tableBody');
-                tableBody.innerHTML = ''; // Clear the table before adding new rows
-                snapshot.forEach(function (childSnapshot) {
-                    let data = childSnapshot.val();
-                    let row = document.createElement('tr');
-                    row.innerHTML = `
-                    <td class="editable" data-id="${childSnapshot.key}" data-field="name">${data.name}</td>
-                    <td class="editable" data-id="${childSnapshot.key}" data-field="contact">${data.contact}</td>
-                    <td class="editable" data-id="${childSnapshot.key}" data-field="type">${data.type}</td>
-                    <td class="editable" data-id="${childSnapshot.key}" data-field="cleaning_date">${data.cleaning_date}</td>
-                    <td class="editable" data-id="${childSnapshot.key}" data-field="progress">${data.progress}</td>
-                    <td class="editable" data-id="${childSnapshot.key}" data-field="cleaning_duration">${data.cleaning_duration}</td>
-                    <td class="editable" data-id="${childSnapshot.key}" data-field="longitude">${data.longitude}</td>
-                    <td class="editable" data-id="${childSnapshot.key}" data-field="latitude">${data.latitude}</td>
-                    <td>
-                        <button class="btn btn-warning" onclick="changeMarkerColor('${childSnapshot.key}')">المكان</button>
-                        <button class="btn btn-success" onclick="gm('${childSnapshot.key}')">Google Maps</button>
-                        <button class="btn btn-danger" onclick="deleteRecord('${childSnapshot.key}')">حذف</button>
+function loadTableData() {
+    messagesRef.once('value', function (snapshot) {
+        const tableBody = document.getElementById('tableBody');
+        tableBody.innerHTML = ''; // Clear the table before adding new rows
+        snapshot.forEach(function (childSnapshot) {
+            let data = childSnapshot.val();
+            let row = document.createElement('tr');
+            row.innerHTML = `
+                <td>
+                    <button class="btn btn-warning" onclick="changeMarkerColor('${childSnapshot.key}')">المكان</button>
+                    <button class="btn btn-success" onclick="gm('${childSnapshot.key}')">Google Maps</button>
+                    <button class="btn btn-danger" onclick="deleteRecord('${childSnapshot.key}')">حذف</button>
+                </td>
+                <td class="editable" data-id="${childSnapshot.key}" data-field="latitude">${data.latitude}</td>
+                <td class="editable" data-id="${childSnapshot.key}" data-field="longitude">${data.longitude}</td>
+                <td class="editable" data-id="${childSnapshot.key}" data-field="cleaning_duration">${data.cleaning_duration}</td>
+                <td class="editable" data-id="${childSnapshot.key}" data-field="progress">${data.progress}</td>
+                <td class="editable" data-id="${childSnapshot.key}" data-field="cleaning_date">${data.cleaning_date}</td>
+                <td class="editable" data-id="${childSnapshot.key}" data-field="type">${data.type}</td>
+                <td class="editable" data-id="${childSnapshot.key}" data-field="contact">${data.contact}</td>
+                <td class="editable" data-id="${childSnapshot.key}" data-field="name">${data.name}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+        attachTableListeners();
+    });
+}
 
-                    </td>
-                `;
-                    tableBody.appendChild(row);
-                });
-                attachTableListeners();
-            });
-        }
 
 
 
